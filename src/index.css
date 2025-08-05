@@ -2,41 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Afeefa's Portfolio Design System - Modern tech aesthetic with gaming vibes */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    /* Core colors - tech-inspired with warm touches */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 240 10% 5%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 240 10% 5%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Primary - tech purple */
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 98%;
+    
+    /* Secondary - soft cyan */
+    --secondary: 180 100% 75%;
+    --secondary-foreground: 240 10% 3.9%;
+    
+    /* Muted tones */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    
+    /* Accent - mint green gaming highlight */
+    --accent: 142 76% 73%;
+    --accent-foreground: 240 10% 3.9%;
+    
+    /* Gaming colors */
+    --gaming-primary: 281 100% 65%;
+    --gaming-secondary: 197 100% 63%;
+    --gaming-accent: 142 71% 45%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gaming-primary)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--gaming-secondary)));
+    --gradient-bg: linear-gradient(135deg, hsl(var(--background)), hsl(240 10% 6%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(240 10% 7%));
+    
+    /* Destructive */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders and inputs */
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 83% 58%;
+    
+    /* Shadows */
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+    --shadow-gaming: 0 0 30px hsl(var(--gaming-primary) / 0.4);
+    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +125,159 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gradient-to-br from-background to-background/90 text-foreground font-inter;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  
+  /* Gaming-inspired scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted/30;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/70;
+  }
+}
+
+@layer components {
+  /* Gaming-inspired button animations */
+  .btn-gaming {
+    @apply relative overflow-hidden transition-all duration-300;
+    @apply before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
+    @apply before:translate-x-[-100%] before:transition-transform before:duration-700;
+    @apply hover:before:translate-x-[100%];
+  }
+  
+  /* Pixel border effect */
+  .pixel-border {
+    @apply relative;
+  }
+  
+  .pixel-border::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg;
+    background: linear-gradient(45deg, 
+      hsl(var(--primary)) 0%,
+      hsl(var(--secondary)) 25%,
+      hsl(var(--accent)) 50%,
+      hsl(var(--gaming-primary)) 75%,
+      hsl(var(--primary)) 100%
+    );
+    background-size: 400% 400%;
+    animation: pixelGlow 3s ease-in-out infinite;
+    border-radius: inherit;
+    z-index: -1;
+    padding: 2px;
+  }
+  
+  .pixel-border::after {
+    content: '';
+    @apply absolute inset-[2px] bg-card rounded-lg;
+    z-index: -1;
+  }
+  
+  /* Floating animations */
+  .float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .float-delayed {
+    animation: float 6s ease-in-out infinite 2s;
+  }
+  
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .glow-gaming {
+    box-shadow: var(--shadow-gaming);
+  }
+  
+  /* Code-style text */
+  .font-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .bg-gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+}
+
+/* Keyframe animations */
+@keyframes pixelGlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
