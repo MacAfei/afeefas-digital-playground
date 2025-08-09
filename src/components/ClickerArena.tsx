@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Zap, Target, Timer, Trophy } from 'lucide-react';
+import { Crown, Zap, Target, Timer, Trophy, Activity, Wifi, Monitor } from 'lucide-react';
 
 interface Player {
   id: string;
@@ -19,6 +19,10 @@ const ClickerArena = () => {
   const [leaderboard, setLeaderboard] = useState<Player[]>([]);
   const [clickAnimation, setClickAnimation] = useState(false);
   const [currentRank, setCurrentRank] = useState(0);
+  const [backgroundClicks, setBackgroundClicks] = useState(0);
+  const [digitalLifeMode, setDigitalLifeMode] = useState(false);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const backgroundClickRef = useRef<number>(0);
 
   // Calculate time until midnight
   const calculateTimeToMidnight = useCallback(() => {
@@ -55,6 +59,49 @@ const ClickerArena = () => {
     setLeaderboard(mockLeaderboard);
   }, []);
 
+  // Digital Life Mode - simulates background clicking
+  useEffect(() => {
+    if (!digitalLifeMode || !isGameActive) return;
+
+    const simulateDigitalLife = () => {
+      // Simulate various digital activities
+      const activities = [
+        { name: 'Google Search', clicks: Math.floor(Math.random() * 3) + 1 },
+        { name: 'Gaming Session', clicks: Math.floor(Math.random() * 8) + 2 },
+        { name: 'File Navigation', clicks: Math.floor(Math.random() * 4) + 1 },
+        { name: 'Web Browsing', clicks: Math.floor(Math.random() * 6) + 1 },
+        { name: 'Email Check', clicks: Math.floor(Math.random() * 3) + 1 }
+      ];
+
+      const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+      const newClicks = randomActivity.clicks;
+      
+      setBackgroundClicks(prev => prev + newClicks);
+      setClicks(prev => prev + newClicks);
+      
+      // Random interval between 3-8 seconds
+      setTimeout(simulateDigitalLife, Math.random() * 5000 + 3000);
+    };
+
+    const timeout = setTimeout(simulateDigitalLife, 2000);
+    return () => clearTimeout(timeout);
+  }, [digitalLifeMode, isGameActive]);
+
+  // Global click detection when tab is active
+  useEffect(() => {
+    if (!isGameActive) return;
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      if (digitalLifeMode) {
+        backgroundClickRef.current++;
+        setClicks(prev => prev + 1);
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, [isGameActive, digitalLifeMode]);
+
   // Update current player rank
   useEffect(() => {
     if (isGameActive && clicks > 0) {
@@ -75,7 +122,13 @@ const ClickerArena = () => {
     if (playerName.trim()) {
       setIsGameActive(true);
       setClicks(0);
+      setBackgroundClicks(0);
+      setSessionStartTime(new Date());
     }
+  };
+
+  const toggleDigitalLifeMode = () => {
+    setDigitalLifeMode(!digitalLifeMode);
   };
 
   const resetGame = () => {
@@ -169,6 +222,47 @@ const ClickerArena = () => {
                   </Card>
                 </div>
 
+                {/* Digital Life Mode Toggle */}
+                <Card className="p-4 mb-6 bg-gradient-to-r from-destructive/5 to-orange-500/5 border-orange-500/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Monitor className="w-6 h-6 text-orange-500" />
+                      <div>
+                        <h3 className="font-bold text-orange-500">DIGITAL LIFE MODE</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {digitalLifeMode 
+                            ? "Your entire digital existence is being tracked" 
+                            : "Only manual clicks count"
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={toggleDigitalLifeMode}
+                      variant={digitalLifeMode ? "destructive" : "outline"}
+                      size="sm"
+                      className={digitalLifeMode ? "animate-pulse" : ""}
+                    >
+                      {digitalLifeMode ? (
+                        <>
+                          <Wifi className="w-4 h-4 mr-2" />
+                          CONNECTED
+                        </>
+                      ) : (
+                        <>
+                          <Activity className="w-4 h-4 mr-2" />
+                          ACTIVATE
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {digitalLifeMode && (
+                    <div className="mt-3 text-xs text-orange-400">
+                      🔥 Background clicks: {backgroundClicks} | Every action on this page counts!
+                    </div>
+                  )}
+                </Card>
+
                 {/* Click Button */}
                 <div className="text-center">
                   <Button
@@ -176,16 +270,24 @@ const ClickerArena = () => {
                     size="lg"
                     className={`w-64 h-64 rounded-full text-2xl font-bold bg-gradient-to-br from-primary via-primary/90 to-primary/80 hover:from-primary/90 hover:via-primary/80 hover:to-primary/70 shadow-2xl shadow-primary/30 transition-all duration-100 ${
                       clickAnimation ? 'scale-95 shadow-3xl shadow-primary/50' : 'scale-100 hover:scale-105'
-                    }`}
+                    } ${digitalLifeMode ? 'ring-4 ring-orange-500/50 ring-pulse' : ''}`}
                   >
                     <div className="text-center">
                       <Zap className="w-12 h-12 mx-auto mb-2" />
-                      CLICK!
+                      {digitalLifeMode ? 'DOMINATE!' : 'CLICK!'}
                     </div>
                   </Button>
                   <p className="mt-4 text-lg text-muted-foreground">
-                    Click as fast as you can, warrior <span className="text-primary font-bold">{playerName}</span>!
+                    {digitalLifeMode 
+                      ? `Every move you make is a weapon, ${playerName}!`
+                      : `Click as fast as you can, warrior ${playerName}!`
+                    }
                   </p>
+                  {digitalLifeMode && (
+                    <p className="mt-2 text-sm text-orange-400 animate-pulse">
+                      🌐 Your digital life is now part of the battle
+                    </p>
+                  )}
                 </div>
 
                 <div className="text-center">
